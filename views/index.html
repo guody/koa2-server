@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>首页</title>
+    <style>
+        .login_in{
+            display: none;
+        }
+        .login_out{
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h2>首页</h2>
+    <div class="login_in">
+        <p>
+            欢迎您！<span id="username"></span>
+        </p>
+        <p>
+            <button>退出登录</button>
+        </p>
+    </div>
+    <div class="login_out">
+        <a href="./login.html">请登录</a>
+    </div>
+
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <script>
+        $(function(){
+            var token = localStorage.getItem('token');
+            console.log(token)
+            $.ajax({
+            url:'http://localhost:3008/api/user/getUser',
+            type: 'GET',
+            dataType:'json',
+            headers:{
+                'token':token
+            },
+            success:function (res){
+                alert('获取用户信息成功-----')
+                console.log(res)
+                if(res.code == '0000'){
+                    // localStorage.setItem('access_token',res.token);
+                }else if(res.code = '0001'){
+                    //alert('请先登录！')
+                }
+            }
+
+            }) 
+
+
+        })           
+   
+
+
+
+
+    </script>
+</body>
+</html>
