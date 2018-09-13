@@ -3,10 +3,11 @@
  */
 const md5 = require('md5')
 const userDao = require('../model/userDao.js')
-const Result = require('../entity/Result');
 const authUtil = require('../utils/authUtil.js');
 const uuidv1 = require('uuid/v1');
 const Base64 = require('js-base64').Base64;
+const ApiErrorNames = require('../config/ApiErrorNames');
+const APIError = require('../middlewares/result').APIError;
 
 /**
  * 查询所有用户
@@ -17,7 +18,7 @@ let findAllUser = async () => {
     user = JSON.stringify(user);
     //把results字符串转为json对象  格式---[{}]
     user = JSON.parse(user);
-    return new Result('0000','查询成功',user);  
+    return user;  
 }
 
 /**
@@ -29,11 +30,11 @@ let findUserById = async (userId) => {
     user = JSON.stringify(user);
     //把results字符串转为json对象  格式---[{}]
     user = JSON.parse(user);
-    return new Result('0000','查询成功',user); 
+    return user; 
 }
 
 /**
- * 用户登陆
+ * 用户登录
  */
 let checkLogin = async (value) => {
     let username = value.username || '';
@@ -46,26 +47,19 @@ let checkLogin = async (value) => {
     user = JSON.parse(user);
 
     if (Array.isArray(user) && user.length == 0) {
-        return new Result('0001','用户名不存在'); 
+        throw new APIError(ApiErrorNames.USER_NOT_EXIST); 
     }
     // 检查密码
     password = Base64.encode(md5(password));   
     if(password !== user[0].password){
-        return new Result('0002','密码错误'); 
+        throw new APIError(ApiErrorNames.PASSWORD_ERROR); 
     }
 
     let userId = user[0].userid;
     // 登陆成功，生成一个登录token
     let access_token = authUtil.genToken(userId);
 
-    // // 更新token
-    // let param = [access_token,user[0].userid]
-    // let result = await userDao.updateUserToken(param);
-
-    let data = {
-        access_token:access_token
-    }
-    return new Result('0000','登陆成功',data)
+    return access_token;
 
 }
 
@@ -82,27 +76,24 @@ let addUser = async (value)=> {
 
     // 检查用户名是否为空
     if(!username){
-        return new Result('0001','用户名不能为空');
+        throw new APIError(ApiErrorNames.USERNAME_EMPTY); 
     }
     //检查密码是否为空
     if(!password){
-        return new Result('0002','密码不能为空');   
+        throw new APIError(ApiErrorNames.PASSWORD_EMPTY);  
     }
     // 用户名唯一性检查  user为数组
     let user = await userDao.findUserByName(username);
     if (Array.isArray(user) && user.length > 0) {
-        return new Result('0003','用户名已占用'); 
+        throw new APIError(ApiErrorNames.USERNAME_EXIST); 
     }
 
     // 生成用户ID
     let userid = uuidv1();
     let param = [userid,username,password]
-    let insertResult = await userDao.addUserData(param);
-
-    // 返回结果中存在insertId即表示插入成功
-    if(insertResult.hasOwnProperty('insertId')){
-        return new Result('0000','添加成功');   
-    }
+    await userDao.addUserData(param);
+    let addUser = await userDao.findUserByName(username);
+    return addUser; 
 }
 
 module.exports = {

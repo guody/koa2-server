@@ -25,6 +25,7 @@
                     type:"POST",
                     data:{"username":name,"password":pwd},
                     success:function(res){
+                        console.log(res)
                         if(res.code == '0000'){
                             alert('登录成功！')
                             window.localStorage.setItem('token',res.data.access_token)

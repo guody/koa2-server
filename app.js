@@ -9,12 +9,17 @@ const json = require('koa-json');
 const session = require('koa-session-minimal')
 const MysqlStore = require('koa-mysql-session')
 const staticCache = require('koa-static-cache')
-var cors = require('koa2-cors')
+const cors = require('koa2-cors')
 
 const config = require('./config/config')
 const routers = require('./routers/index')
+
+/**
+ * 中间件
+ */
 const logPrint = require('./middlewares/log_print');  //日志输出
 const authToken = require('./middlewares/auth_token')
+const result = require('./middlewares/result')
 
 const app = new Koa()
 
@@ -60,6 +65,9 @@ app.use(views(path.join(__dirname, './views'), {
 
 // log文件输出
 app.use(logPrint);
+
+// 返回结果处理
+app.use(result.restify());
 
 // token验证
 app.use(authToken);

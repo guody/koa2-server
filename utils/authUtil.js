@@ -1,6 +1,7 @@
 const fs = require('fs')
 const jwt = require('jsonwebtoken')
-const Result = require('../entity/Result');
+const ApiErrorNames = require('../config/ApiErrorNames');
+const APIError = require('../middlewares/result').APIError;
 /**
  * 生成UUID
  */
@@ -16,6 +17,7 @@ let genUUID = () => {
  */
 
 let genToken = (userId)=> {
+   
     // 获取签发 JWT 时需要用的密钥
     const privateKey = fs.readFileSync('./config/cert/private.key')
     // Token 数据
@@ -43,12 +45,14 @@ let verifyToken = (ctx,token)=> {
     // 获取验证 JWT 时需要用的公钥
     const publicKey = fs.readFileSync('./config/cert/public.key')
     // 验证 Token
+    console.log(token)
     try {
         //验证token是否有效
         payload = jwt.verify(token, publicKey, {algorithms: 'RS256'});
+        console.log(payload)
     } catch (err) {
         console.log(err);
-        ctx.body = new Result('401','token失效，请重新登录'); 
+        throw new APIError(ApiErrorNames.INVALID_TOKEN);
         return;
     }
     return payload;  
