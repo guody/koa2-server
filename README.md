@@ -12,11 +12,9 @@ mysql操作可运用ORM（对象关系映射）框架Sequelize，详细使用可
 **目录说明:**   
 bin----启动入口（通过www文件引入app.js)  
 config----配置文件（数据库、服务端口配置，log4js日志输出配置)   
-entity----实体类  
 controller----控制层  
 model----数据模型  
 service----业务层  
-error----API请求错误处理  
 logs----日志输出文件目录  
 middlewares----自定义中间件（日志、格式化响应)  
 routers----路由（index.js为路由入口)  
