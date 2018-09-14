@@ -40,15 +40,14 @@ let genToken = (userId)=> {
  * 验证登录token
  * payload返回null时表示不合法或者过期
  */
-let verifyToken = (ctx,token)=> {
+let verifyToken = (token)=> {
     let payload = null;
     // 获取验证 JWT 时需要用的公钥
     const publicKey = fs.readFileSync('./config/cert/public.key')
     // 验证 Token
-    console.log(token)
     try {
         //验证token是否有效
-        payload = jwt.verify(token, publicKey, {algorithms: 'RS256'});
+        payload = jwt.verify(token,publicKey,{algorithms:'RS256'});
         console.log(payload)
     } catch (err) {
         console.log(err);

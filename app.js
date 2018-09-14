@@ -69,11 +69,13 @@ app.use(logPrint);
 // 返回结果处理
 app.use(result.restify());
 
-// token验证
-app.use(authToken);
+
 
 // 解决跨域
 app.use(cors());
+
+// token验证
+app.use(authToken);
 
 // 初始化路由中间件
 app.use(routers.routes())
